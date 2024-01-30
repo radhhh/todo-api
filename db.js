@@ -3,13 +3,13 @@ const { MongoClient } = require('mongodb');
 let dbConnection;
 
 module.exports = {
-    connectToDB: async (cb) => {
-        MongoClient.connect('mongodb://localhost:27017/bookstore')
+    connectToDB: (cb) => {
+        MongoClient.connect(process.env.DBLINK)
             .then(client => {
                 dbConnection = client.db();
                 cb()
             })
-            .catch(() => {
+            .catch((e) => {
                 console.log(e);
                 return cb(e);
             })
