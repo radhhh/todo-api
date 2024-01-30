@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const { ObjectId } = require('mongodb');
+const validate = require('./validation');
 const { connectToDB, getDB } = require('./db');
 let db;
 
@@ -13,13 +14,31 @@ connectToDB((err) => {
     app.listen(3000, () => console.log("Listening at port 3000"));
 });
 
+app.use(express.json());
+
 app.get('/todos/', async (req, res) => {
     try{
-        const data = await db.collection('todos').find().toArray();
-        res.status(200).json(data);
+        const todos = await db.collection('todos').find().toArray();
+        res.status(200).json(todos);
     }
     catch(err){
-        console.error('Database Fetch Failure - all documents');
+        console.error('Database Fetch Failure - All Documents');
         res.status(500).json({err: "Database Fetch Failure"});
     }
 });
+
+app.post('/todos/', async (req, res) => {
+    const todo = req.body;
+    console.log(todo);
+    try{
+        const validatedTodo = validate(todo);
+        if(validatedTodo === undefined) throw "Invalid Body";
+
+        const report = await db.collection('todos').insertOne(todo);
+        res.status(201).json(report);
+    }
+    catch(err){
+        console.error('Database Insert Failure - Single Document:', err);
+        res.status(500).json({error: "Database Insert Failure"});
+    }
+})
