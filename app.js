@@ -22,8 +22,8 @@ app.get('/todos/', async (req, res) => {
         res.status(200).json(todos);
     }
     catch(err){
-        console.error('Database Fetch Failure - All Documents');
-        res.status(500).json({err: "Database Fetch Failure"});
+        console.error('Database Fetch Failure - All Documents', err);
+        res.status(500).json({error: "Database Fetch Failure"});
     }
 });
 
@@ -34,7 +34,7 @@ app.post('/todos/', async (req, res) => {
         const validatedTodo = validate(todo);
         if(validatedTodo === undefined) throw "Invalid Body";
 
-        const report = await db.collection('todos').insertOne(todo);
+        const report = await db.collection('todos').insertOne(validatedTodo);
         res.status(201).json(report);
     }
     catch(err){
@@ -42,3 +42,14 @@ app.post('/todos/', async (req, res) => {
         res.status(500).json({error: "Database Insert Failure"});
     }
 })
+
+app.get('/todos/:id', async (req, res) => {
+    try{
+        const todo = await db.collection('todos').findOne({_id: new ObjectId(req.params.id)});
+        res.status(200).json(todo);
+    }
+    catch(err){
+        console.error('Database Fetch Failure - Single Documents', err);
+        res.status(500).json({error: "Database Fetch Failure"});
+    }
+});

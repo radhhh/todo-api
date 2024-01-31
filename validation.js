@@ -14,7 +14,6 @@ function validate(todo){
         if(todo.tags) data.tags = todo.tags;
         if(todo.type) data.type = todo.type;
         if(todo.description) data.description = todo.description;
-        console.log("valid");
         return data;
     }
     else return undefined;
